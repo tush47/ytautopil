@@ -3,15 +3,29 @@ from crewai import Crew, Process
 from agents import YoutubeAutomationAgents
 from tasks import YoutubeAutomationTasks
 from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from tools.youtube_video_details_tool import YoutubeVideoDetailsTool
 from tools.youtube_video_search_tool import YoutubeVideoSearchTool
 
 from dotenv import load_dotenv
 load_dotenv()
 
+import getpass
+import os
+
+os.environ["GROQ_API_KEY"] = getpass.getpass("Enter your Groq API key: ")
+
 # Initialize the OpenAI GPT-4 language model
-OpenAIGPT4 = ChatOpenAI(
-    model="gpt-4"
+# OpenAIGPT4 = ChatOpenAI(
+#     model="gpt-4"
+# )
+
+llm = ChatGroq(
+    model="mixtral-8x7b-32768",
+    temperature=0,
+    max_tokens=None,
+    timeout=None,
+    max_retries=2,
 )
 
 agents = YoutubeAutomationAgents()
@@ -77,7 +91,7 @@ crew = Crew(
            manage_youtube_video_research,
            create_email_announcement_for_new_video],
     process=Process.hierarchical,
-    manager_llm=OpenAIGPT4
+    manager_llm=llm
 )
 
 # Kick of the crew
